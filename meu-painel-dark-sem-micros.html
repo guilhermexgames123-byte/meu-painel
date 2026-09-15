@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Meu Painel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#0B0D12; --bg2:#121722;
+    --card:#171B24;
+    --ink:#F3F5FA; --muted:#929AAA; --line:#292F3B;
+    --blue:#6D7CFF; --blue-soft:#222A4A;
+    --green:#28D7A0; --green-soft:#173B34;
+    --red:#FF646A; --red-soft:#402226;
+    --orange:#FFB24A; --orange-soft:#44331C;
+    --purple:#9A8CFF; --purple-soft:#302A4B;
+    --radius:20px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{margin:0; font-family:'Inter',sans-serif; background:linear-gradient(180deg,var(--bg1) 0%, var(--bg2) 260px); color:var(--ink); min-height:100vh;}
+  h1,h2,h3,.disp{font-family:'Manrope',sans-serif;}
+  #app{max-width:480px; margin:0 auto; padding:20px 16px 96px; min-height:100vh;}
+  header.top{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+  header.top h1{font-size:22px; font-weight:800; margin:0;}
+  header.top .date{font-size:13px; color:var(--muted); margin-top:2px;}
+  .card{background:var(--card); border-radius:var(--radius); padding:16px; box-shadow:0 4px 20px rgba(31,41,84,.06); margin-bottom:14px;}
+  .row{display:flex; align-items:center; gap:12px;}
+  .between{justify-content:space-between;}
+  .muted{color:var(--muted);}
+  .small{font-size:12px;}
+  .icon-badge{width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;}
+  button{font-family:inherit; cursor:pointer; border:none;}
+  .btn{background:var(--blue); color:#fff; border-radius:12px; padding:10px 16px; font-weight:700; font-size:14px;}
+  .btn.secondary{background:var(--blue-soft); color:var(--blue);}
+  .btn.block{width:100%;}
+  .btn.ghost{background:transparent; color:var(--blue); padding:6px 10px;}
+  .fab{position:fixed; bottom:88px; right:calc(50% - 240px + 16px); max-width:480px; background:var(--blue); color:#fff; width:52px; height:52px; border-radius:50%; font-size:26px; box-shadow:0 8px 20px rgba(74,95,232,.4); z-index:20;}
+  @media (max-width:512px){ .fab{right:16px;} }
+  input, select{font-family:inherit; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:14px; width:100%; background:#10141C; color:var(--ink);}
+  label.f{font-size:12px; color:var(--muted); font-weight:600; margin-bottom:4px; display:block;}
+  .field{margin-bottom:10px;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;}
+  .chip{border-radius:10px; padding:8px 4px; text-align:center; font-size:13px; font-weight:600; background:var(--blue-soft); color:var(--blue);}
+  .chip.active{background:var(--blue); color:#fff;}
+  .progress-track{background:var(--line); border-radius:8px; height:8px; overflow:hidden;}
+  .progress-fill{height:100%; border-radius:8px; background:var(--green);}
+  .empty{text-align:center; padding:30px 10px; color:var(--muted); font-size:14px;}
+  .navbar{position:fixed; bottom:0; left:0; right:0; background:#11151D; border-top:1px solid var(--line); padding:8px 4px calc(8px + env(safe-area-inset-bottom)); z-index:10;}
+  .navwrap{max-width:480px; margin:0 auto; display:flex; overflow-x:auto; gap:2px;}
+  .navitem{flex:1; min-width:64px; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 2px; border-radius:12px; background:transparent; color:var(--muted);}
+  .navitem.active{color:var(--blue); background:var(--blue-soft);}
+  .navitem .ic{font-size:19px;}
+  .navitem .lb{font-size:10px; font-weight:700;}
+  .modal-bg{position:fixed; inset:0; background:rgba(20,22,40,.45); display:flex; align-items:flex-end; z-index:30;}
+  .modal{background:#171B24; width:100%; max-width:480px; margin:0 auto; border-radius:24px 24px 0 0; padding:20px 18px calc(20px + env(safe-area-inset-bottom)); max-height:85vh; overflow-y:auto;}
+  .modal h3{margin:0 0 14px;}
+  .x{background:var(--line); width:30px; height:30px; border-radius:50%; font-size:15px; color:var(--muted);}
+  .ring-wrap{position:relative; width:110px; height:110px;}
+  .ring-wrap svg{transform:rotate(-90deg);}
+  .ring-label{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .ring-label .pct{font-weight:800; font-size:20px;}
+  .list-item{display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--line);}
+  .list-item:last-child{border-bottom:none;}
+  .check-circle{width:30px; height:30px; border-radius:50%; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; color:#fff;}
+  .check-circle.done{background:var(--green); border-color:var(--green);}
+  .trash{color:var(--red); font-size:13px; font-weight:700; background:var(--red-soft); border-radius:10px; padding:6px 10px;}
+  .weekdays{display:flex; gap:6px; flex-wrap:wrap;}
+  .wd{width:30px; height:30px; border-radius:8px; background:var(--line); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--muted);}
+  .wd.on{background:var(--blue); color:#fff;}
+  .kcal-bar{display:flex; height:10px; border-radius:6px; overflow:hidden; background:var(--line);}
+  .toast{position:fixed; top:16px; left:50%; transform:translateX(-50%); background:#1E2233; color:#fff; padding:10px 16px; border-radius:12px; font-size:13px; z-index:50; opacity:0; transition:opacity .2s;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="navbar"><div class="navwrap" id="navwrap"></div></div>
+<button class="fab" id="fab" onclick="openAddModal()">+</button>
+<div id="modalRoot"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- estado ---------- */
+const TABS = [
+  {id:'habitos', label:'Hábitos', icon:'🎯'},
+  {id:'dieta', label:'Dieta', icon:'🍎'},
+  {id:'agua', label:'Água', icon:'💧'},
+  {id:'treino', label:'Treino', icon:'🏋️'},
+  {id:'financeiro', label:'Finanças', icon:'💰'},
+  {id:'investir', label:'Investir', icon:'📈'},
+  {id:'metas', label:'Metas', icon:'🏁'},
+];
+let currentTab = 'habitos';
+let DATA = {
+  habitos: [], treinos: [], transacoes: [], investimentos: [], metas: [],
+  agua_log:{}, agua_meta:2000,
+  dieta_log:{}, dieta_meta:{kcal:2000, prot:150, carb:220, gord:60},
+};
+function todayStr(){
+  const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const p = Object.fromEntries(parts.map(x=>[x.type,x.value]));
+  return `${p.year}-${p.month}-${p.day}`;
+}
+const uid = ()=> Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const fmtDate = (d)=> { const dt = new Date(d+'T00:00:00'); return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}); };
+const money = (v)=> (v<0?'-':'')+'R$ '+Math.abs(v).toFixed(2).replace('.',',');
+
+function showToast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.style.opacity='1';
+  setTimeout(()=>t.style.opacity='0',1600);
+}
+
+/* ---------- storage helpers ---------- */
+const STORAGE_PREFIX = 'meu_painel_';
+async function loadKey(key, fallback){
+  try{
+    const raw = localStorage.getItem(STORAGE_PREFIX + key);
+    return raw !== null ? JSON.parse(raw) : fallback;
+  }catch(e){ return fallback; }
+}
+async function saveKey(key, value){
+  try{
+    localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value));
+    return true;
+  }catch(e){ showToast('Não foi possível salvar no navegador'); return false; }
+}
+async function loadAll(){
+  const [h,tr,txn,inv,mt,al,am,dl,dm] = await Promise.all([
+    loadKey('habitos', []), loadKey('treinos', []), loadKey('transacoes', []),
+    loadKey('investimentos', []), loadKey('metas', []),
+    loadKey('agua_log', {}), loadKey('agua_meta', 2000),
+    loadKey('dieta_log', {}), loadKey('dieta_meta', {kcal:2000,prot:150,carb:220,gord:60}),
+  ]);
+  DATA = {habitos:h, treinos:tr, transacoes:txn, investimentos:inv, metas:mt, agua_log:al, agua_meta:am, dieta_log:dl, dieta_meta:dm};
+}
+
+/* ---------- nav ---------- */
+function renderNav(){
+  const wrap = document.getElementById('navwrap');
+  wrap.innerHTML = TABS.map(t=>`
+    <button class="navitem ${t.id===currentTab?'active':''}" onclick="switchTab('${t.id}')">
+      <span class="ic">${t.icon}</span><span class="lb">${t.label}</span>
+    </button>`).join('');
+}
+function switchTab(id){ currentTab = id; render(); }
+
+/* ---------- root render ---------- */
+function render(){
+  renderNav();
+  const el = document.getElementById('app');
+  const renderers = {habitos:renderHabitos, dieta:renderDieta, agua:renderAgua, treino:renderTreino, financeiro:renderFinanceiro, investir:renderInvestir, metas:renderMetas};
+  el.innerHTML = header() + '<div id="tabContent"></div>';
+  document.getElementById('tabContent').innerHTML = renderers[currentTab]();
+}
+function header(){
+  const nomes = {habitos:'Hábitos', dieta:'Dieta', agua:'Água', treino:'Treino', financeiro:'Finanças', investir:'Investimentos', metas:'Metas'};
+  const dt = new Date().toLocaleDateString('pt-BR',{weekday:'long', day:'2-digit', month:'long'});
+  return `<header class="top"><div><h1>${nomes[currentTab]}</h1><div class="date">${dt}</div></div></header>`;
+}
+
+/* ================= HÁBITOS ================= */
+function renderHabitos(){
+  const today = todayStr();
+  const dow = new Date().getDay(); // 0=dom
+  const visiveis = DATA.habitos.filter(h=> h.tipo==='diario' || (h.tipo==='dias' && h.dias.includes(dow)) || (h.tipo==='unico' && !h.feitoEm));
+  if(!DATA.habitos.length) return emptyState('🎯','Nenhum hábito ainda','Toque no + para criar seu primeiro hábito.');
+  const feitos = visiveis.filter(h=>h.checks[today]).length;
+  return `
+  <div class="card">
+    <div class="row between"><div><b>${feitos}/${visiveis.length}</b> concluídos hoje</div></div>
+    <div class="progress-track" style="margin-top:8px;"><div class="progress-fill" style="width:${visiveis.length? feitos/visiveis.length*100:0}%"></div></div>
+  </div>
+  <div class="card">
+    ${visiveis.length? visiveis.map(h=>{
+      const done = !!h.checks[today];
+      const streak = calcStreak(h);
+      return `<div class="list-item">
+        <button class="check-circle ${done?'done':''}" onclick="toggleHabito('${h.id}')">${done?'✓':''}</button>
+        <div class="icon-badge" style="background:${h.cor}22;">${h.icone}</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;">${h.nome}</div>
+          <div class="small muted">${streak>0? '🔥 '+streak+' dias seguidos' : tipoLabel(h)}</div>
+        </div>
+        <button class="trash" onclick="delHabito('${h.id}')">Excluir</button>
+      </div>`;
+    }).join('') : emptyState('✅','Nada para hoje','Sem hábitos programados para hoje.')}
+  </div>
+  ${DATA.habitos.some(h=>h.tipo==='unico'&&h.feitoEm) ? `<div class="card"><div class="small muted" style="margin-bottom:8px;">Concluídos (únicos)</div>
+    ${DATA.habitos.filter(h=>h.tipo==='unico'&&h.feitoEm).map(h=>`<div class="list-item"><div class="icon-badge" style="background:${h.cor}22;">${h.icone}</div><div style="flex:1;"><div style="font-weight:700;">${h.nome}</div><div class="small muted">Feito em ${fmtDate(h.feitoEm)}</div></div><button class="trash" onclick="delHabito('${h.id}')">Excluir</button></div>`).join('')}
+  </div>`:''}
+  `;
+}
+function tipoLabel(h){
+  if(h.tipo==='diario') return 'Todos os dias';
+  if(h.tipo==='unico') return 'Único';
+  const dias=['D','S','T','Q','Q','S','S']; return 'Dias: '+h.dias.map(d=>dias[d]).join(' ');
+}
+function calcStreak(h){
+  let s=0, d=new Date();
+  while(true){ const key=d.toISOString().slice(0,10); if(h.checks[key]){ s++; d.setDate(d.getDate()-1);} else break; }
+  return s;
+}
+async function toggleHabito(id){
+  const h = DATA.habitos.find(x=>x.id===id); const today=todayStr();
+  if(h.tipo==='unico'){ h.feitoEm = h.feitoEm? null : today; }
+  else { h.checks[today] = !h.checks[today]; if(!h.checks[today]) delete h.checks[today]; }
+  await saveKey('habitos', DATA.habitos); render();
+}
+async function delHabito(id){
+  DATA.habitos = DATA.habitos.filter(h=>h.id!==id); await saveKey('habitos', DATA.habitos); render();
+}
+
+/* ================= DIETA ================= */
+function renderDieta(){
+  const today = todayStr();
+  const log = DATA.dieta_log[today] || [];
+  const tot = log.reduce((a,i)=>({kcal:a.kcal+i.kcal, prot:a.prot+i.prot, carb:a.carb+i.carb, gord:a.gord+i.gord}), {kcal:0,prot:0,carb:0,gord:0});
+  const m = DATA.dieta_meta;
+  const macroRow = (label,val,meta,color)=>`
+    <div style="margin-bottom:10px;">
+      <div class="row between small"><span>${label}</span><span class="muted">${Math.round(val)}g / ${meta}g</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:${Math.min(100,val/meta*100)}%; background:${color};"></div></div>
+    </div>`;
+  return `
+  <div class="card">
+    <div class="row between"><div style="font-weight:800; font-size:16px;">${Math.round(tot.kcal)} / ${m.kcal} kcal</div><button class="btn ghost" onclick="openMetaDietaModal()">Editar meta</button></div>
+    <div class="progress-track" style="margin:8px 0 14px;"><div class="progress-fill" style="width:${Math.min(100,tot.kcal/m.kcal*100)}%; background:var(--orange);"></div></div>
+    ${macroRow('Proteína', tot.prot, m.prot, 'var(--blue)')}
+    ${macroRow('Carboidrato', tot.carb, m.carb, 'var(--green)')}
+    ${macroRow('Gordura', tot.gord, m.gord, 'var(--purple)')}
+  </div>
+  <div class="card">
+    <div class="small muted" style="margin-bottom:8px;">Refeições de hoje</div>
+    ${log.length? log.map((i,idx)=>`<div class="list-item">
+        <div class="icon-badge" style="background:var(--orange-soft);">🍽️</div>
+        <div style="flex:1;"><div style="font-weight:700;">${i.nome} <span class="muted small">x${i.qtd}</span></div>
+        <div class="small muted">${Math.round(i.kcal)} kcal · P${Math.round(i.prot)} C${Math.round(i.carb)} G${Math.round(i.gord)}</div></div>
+        <button class="trash" onclick="delRefeicao(${idx})">Excluir</button>
+      </div>`).join('') : emptyState('🍎','Nada registrado hoje','Toque no + para adicionar um alimento.')}
+  </div>`;
+}
+async function delRefeicao(idx){
+  const today=todayStr(); DATA.dieta_log[today].splice(idx,1); await saveKey('dieta_log', DATA.dieta_log); render();
+}
+
+/* ================= ÁGUA ================= */
+function startOfWeekBrazil(){
+  const d = new Date();
+  const parts = new Intl.DateTimeFormat('en-US',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
+  const p=Object.fromEntries(parts.map(x=>[x.type,x.value]));
+  const base=new Date(`${p.year}-${p.month}-${p.day}T12:00:00`);
+  const day=base.getDay();
+  base.setDate(base.getDate()-(day===0?6:day-1));
+  return base;
+}
+function waterHistoryHtml(){
+  const start=startOfWeekBrazil();
+  const labels=['SEG','TER','QUA','QUI','SEX','SÁB','DOM'];
+  return `<div class="card"><div class="row between"><div><div style="font-weight:800;">Histórico da semana</div><div class="small muted">Segunda a domingo</div></div><span>📊</span></div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:14px;">${labels.map((lab,i)=>{ const d=new Date(start); d.setDate(start.getDate()+i); const key=d.toISOString().slice(0,10); const val=DATA.agua_log[key]||0; const pct=Math.min(100,Math.round(val/DATA.agua_meta*100)); return `<div style="text-align:center;"><div class="small muted" style="font-weight:700;">${lab}</div><div style="height:70px;display:flex;align-items:flex-end;justify-content:center;margin:5px 0;"><div title="${val} ml" style="width:22px;height:${Math.max(6,pct*0.65)}px;border-radius:6px 6px 3px 3px;background:var(--blue);"></div></div><div style="font-size:10px;font-weight:700;">${val>=1000?(val/1000).toFixed(1)+'L':val+'ml'} </div></div>`;}).join('')}</div></div>`;
+}
+function renderAgua(){
+  const today = todayStr();
+  const total = DATA.agua_log[today] || 0;
+  const meta = DATA.agua_meta;
+  const pct = meta ? Math.min(100, Math.round(total/meta*100)) : 0;
+  const r=48, c=2*Math.PI*r, off = c - (pct/100)*c;
+  return `
+  <div class="card" style="display:flex; flex-direction:column; align-items:center;">
+    <div class="ring-wrap">
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        <circle cx="55" cy="55" r="${r}" stroke="#263142" stroke-width="10" fill="none"/>
+        <circle cx="55" cy="55" r="${r}" stroke="#3AA0FF" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"/>
+      </svg>
+      <div class="ring-label"><span style="font-size:22px;">💧</span><span class="pct">${pct}%</span></div>
+    </div>
+    <div style="margin-top:10px; font-weight:700;">${total} / ${meta} ml</div>
+    <button class="btn ghost" onclick="openMetaAguaModal()">Editar meta</button>
+  </div>
+  <div class="card">
+    <div class="small muted" style="margin-bottom:10px;">Adicionar</div>
+    <div class="grid3">
+      ${[50,100,200,250].map(v=>`<button class="chip" onclick="addAgua(${v})">+${v}ml</button>`).join('')}
+    </div>
+    <div style="margin-top:10px;"><button class="btn secondary block" onclick="zerarAgua()">Zerar hoje</button></div>
+  </div>
+  ${waterHistoryHtml()}`;
+}
+async function addAgua(v){
+  const today=todayStr();
+  DATA.agua_log[today] = Math.max(0,(DATA.agua_log[today]||0)+v);
+  await saveKey('agua_log', DATA.agua_log); render();
+}
+async function zerarAgua(){
+  DATA.agua_log[todayStr()] = 0;
+  await saveKey('agua_log', DATA.agua_log);
+  render();
+}
+
+/* ================= TREINO ================= */
+function renderTreino(){
+  if(!DATA.treinos.length) return emptyState('🏋️','Nenhum treino ainda','Toque no + para criar um treino.');
+  return DATA.treinos.map(t=>{
+    const feitos = t.exercicios.filter(e=>e.feito).length;
+    return `<div class="card">
+      <div class="row between"><div style="font-weight:800;">${t.nome}</div><button class="trash" onclick="delTreino('${t.id}')">Excluir</button></div>
+      <div class="small muted" style="margin:4px 0 10px;">${feitos}/${t.exercicios.length} concluídos</div>
+      <div class="progress-track" style="margin-bottom:10px;"><div class="progress-fill" style="width:${t.exercicios.length? feitos/t.exercicios.length*100:0}%"></div></div>
+      ${t.exercicios.map((e,idx)=>`<div class="list-item">
+        <button class="check-circle ${e.feito?'done':''}" onclick="toggleExercicio('${t.id}',${idx})">${e.feito?'✓':''}</button>
+        <div style="flex:1;"><div style="font-weight:600;">${e.nome}</div><div class="small muted">${e.series}x${e.reps}</div></div>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+async function toggleExercicio(tid, idx){
+  const t = DATA.treinos.find(x=>x.id===tid); t.exercicios[idx].feito = !t.exercicios[idx].feito;
+  await saveKey('treinos', DATA.treinos); render();
+}
+async function delTreino(id){ DATA.treinos = DATA.treinos.filter(t=>t.id!==id); await saveKey('treinos', DATA.treinos); render(); }
+
+/* ================= FINANCEIRO ================= */
+function renderFinanceiro(){
+  const saldo = DATA.transacoes.reduce((a,t)=> a + (t.tipo==='entrada'? t.valor : -t.valor), 0);
+  const entradas = DATA.transacoes.filter(t=>t.tipo==='entrada').reduce((a,t)=>a+t.valor,0);
+  const saidas = DATA.transacoes.filter(t=>t.tipo!=='entrada').reduce((a,t)=>a+t.valor,0);
+  const ordenadas = [...DATA.transacoes].sort((a,b)=> b.data.localeCompare(a.data));
+  return `
+  <div class="card">
+    <div class="small muted">Saldo</div>
+    <div class="disp" style="font-size:28px; font-weight:800; color:${saldo<0?'var(--red)':'var(--ink)'};">${money(saldo)}</div>
+    <div class="row between" style="margin-top:12px;">
+      <div><div class="small muted">Entradas</div><div style="font-weight:700; color:var(--green);">${money(entradas)}</div></div>
+      <div><div class="small muted">Saídas</div><div style="font-weight:700; color:var(--red);">${money(saidas)}</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="small muted" style="margin-bottom:8px;">Transações</div>
+    ${ordenadas.length? ordenadas.map(t=>`<div class="list-item">
+      <div class="icon-badge" style="background:${t.tipo==='entrada'?'var(--green-soft)':'var(--red-soft)'};">${t.tipo==='entrada'?'⬆️':(t.categoria==='plano'?'📌':'⬇️')}</div>
+      <div style="flex:1;"><div style="font-weight:700;">${t.desc||(t.categoria==='plano'?'Plano':'Gasto')}</div><div class="small muted">${fmtDate(t.data)} · ${t.categoria}</div></div>
+      <div style="font-weight:700; color:${t.tipo==='entrada'?'var(--green)':'var(--red)'};">${t.tipo==='entrada'?'+':'-'}${money(t.valor).replace('R$ ','R$ ')}</div>
+      <button class="trash" onclick="delTransacao('${t.id}')">✕</button>
+    </div>`).join('') : emptyState('💰','Nada lançado ainda','Toque no + para registrar dinheiro, gasto ou plano.')}
+  </div>`;
+}
+async function delTransacao(id){ DATA.transacoes = DATA.transacoes.filter(t=>t.id!==id); await saveKey('transacoes', DATA.transacoes); render(); }
+
+/* ================= INVESTIMENTOS ================= */
+function renderInvestir(){
+  const total = DATA.investimentos.reduce((a,i)=>a+i.valor,0);
+  const porTipo = {};
+  DATA.investimentos.forEach(i=> porTipo[i.tipo] = (porTipo[i.tipo]||0)+i.valor);
+  return `
+  <div class="card">
+    <div class="small muted">Total investido</div>
+    <div class="disp" style="font-size:28px; font-weight:800;">${money(total)}</div>
+    ${Object.keys(porTipo).length? `<div style="margin-top:12px;">${Object.entries(porTipo).map(([k,v])=>`
+      <div class="row between small" style="margin-bottom:4px;"><span>${k}</span><span class="muted">${money(v)} · ${total? Math.round(v/total*100):0}%</span></div>
+    `).join('')}</div>`:''}
+  </div>
+  <div class="card">
+    <div class="small muted" style="margin-bottom:8px;">Aportes</div>
+    ${DATA.investimentos.length? DATA.investimentos.map(i=>`<div class="list-item">
+      <div class="icon-badge" style="background:var(--purple-soft);">📈</div>
+      <div style="flex:1;"><div style="font-weight:700;">${i.nome}</div><div class="small muted">${i.tipo} · desde ${fmtDate(i.data)}${i.obs? ' · '+i.obs:''}</div></div>
+      <div style="font-weight:700;">${money(i.valor)}</div>
+      <button class="trash" onclick="delInvestimento('${i.id}')">✕</button>
+    </div>`).join('') : emptyState('📈','Nenhum investimento','Toque no + para registrar um aporte.')}
+  </div>`;
+}
+async function delInvestimento(id){ DATA.investimentos = DATA.investimentos.filter(i=>i.id!==id); await saveKey('investimentos', DATA.investimentos); render(); }
+
+/* ================= METAS ================= */
+function renderMetas(){
+  if(!DATA.metas.length) return emptyState('🏁','Nenhuma meta ainda','Toque no + para criar uma meta.');
+  return DATA.metas.map(m=>{
+    const pct = m.alvo? Math.min(100, Math.round(m.atual/m.alvo*100)) : 0;
+    return `<div class="card">
+      <div class="row between"><div style="font-weight:800;">${m.titulo}</div><button class="trash" onclick="delMeta('${m.id}')">Excluir</button></div>
+      <div class="small muted" style="margin:4px 0 8px;">${m.atual}${m.unidade} de ${m.alvo}${m.unidade}${m.prazo? ' · até '+fmtDate(m.prazo):''}</div>
+      <div class="progress-track" style="margin-bottom:10px;"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="row" style="gap:8px;">
+        <input type="number" placeholder="valor" id="metaAdd_${m.id}" style="flex:1;">
+        <button class="btn secondary" onclick="addMetaProgresso('${m.id}')">Atualizar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function addMetaProgresso(id){
+  const inp = document.getElementById('metaAdd_'+id); const v = parseFloat(inp.value);
+  if(isNaN(v)) return;
+  const m = DATA.metas.find(x=>x.id===id); m.atual = v;
+  await saveKey('metas', DATA.metas); render();
+}
+async function delMeta(id){ DATA.metas = DATA.metas.filter(m=>m.id!==id); await saveKey('metas', DATA.metas); render(); }
+
+/* ================= EMPTY STATE ================= */
+function emptyState(icon,title,sub){
+  return `<div class="empty"><div style="font-size:34px; margin-bottom:8px;">${icon}</div><div style="font-weight:700; color:var(--ink);">${title}</div><div>${sub}</div></div>`;
+}
+
+/* ================= MODALS (adicionar) ================= */
+function closeModal(){ document.getElementById('modalRoot').innerHTML=''; }
+function modalShell(title, bodyHtml){
+  return `<div class="modal-bg" onclick="if(event.target===this) closeModal()">
+    <div class="modal">
+      <div class="row between"><h3>${title}</h3><button class="x" onclick="closeModal()">✕</button></div>
+      ${bodyHtml}
+    </div></div>`;
+}
+
+function openAddModal(){
+  const builders = {habitos:habitoForm, dieta:dietaForm, agua:null, treino:treinoForm, financeiro:financeiroForm, investir:investirForm, metas:metaForm};
+  if(currentTab==='agua'){ return; } // água usa os chips, sem modal
+  const html = builders[currentTab]();
+  document.getElementById('modalRoot').innerHTML = html;
+}
+
+/* --- hábito --- */
+const CORES = ['#4A5FE8','#1FC98D','#FF5A5F','#FFA53E','#8B7CF6','#3AA0FF'];
+function habitoForm(){
+  return modalShell('Novo hábito', `
+    <div class="field"><label class="f">Nome</label><input id="hNome" placeholder="Ex: Beber água, Ler, Meditar"></div>
+    <div class="field"><label class="f">Ícone (emoji)</label><input id="hIcone" placeholder="🎯" maxlength="2" value="🎯"></div>
+    <div class="field"><label class="f">Repetição</label>
+      <div class="grid3">
+        <button class="chip active" id="tipo_diario" onclick="setTipoHabito('diario')">Todo dia</button>
+        <button class="chip" id="tipo_dias" onclick="setTipoHabito('dias')">Dias fixos</button>
+        <button class="chip" id="tipo_unico" onclick="setTipoHabito('unico')">Único</button>
+      </div>
+    </div>
+    <div class="field" id="diasWrap" style="display:none;">
+      <label class="f">Escolha os dias</label>
+      <div class="weekdays" id="diasPicker">
+        ${['D','S','T','Q','Q','S','S'].map((d,i)=>`<button class="wd" data-d="${i}" onclick="toggleDiaPick(${i})">${d}</button>`).join('')}
+      </div>
+    </div>
+    <button class="btn block" onclick="salvarHabito()">Salvar hábito</button>
+  `);
+}
+let novoHabitoTipo='diario'; let diasPick=[];
+function setTipoHabito(t){
+  novoHabitoTipo=t;
+  ['diario','dias','unico'].forEach(x=> document.getElementById('tipo_'+x).classList.toggle('active', x===t));
+  document.getElementById('diasWrap').style.display = t==='dias'?'block':'none';
+}
+function toggleDiaPick(i){
+  const btn = document.querySelector(`#diasPicker [data-d="${i}"]`);
+  if(diasPick.includes(i)){ diasPick=diasPick.filter(x=>x!==i); btn.classList.remove('on'); }
+  else { diasPick.push(i); btn.classList.add('on'); }
+}
+async function salvarHabito(){
+  const nome = document.getElementById('hNome').value.trim();
+  if(!nome){ showToast('Digite um nome'); return; }
+  const icone = document.getElementById('hIcone').value.trim() || '🎯';
+  const h = {id:uid(), nome, icone, cor:CORES[DATA.habitos.length%CORES.length], tipo:novoHabitoTipo, dias:[...diasPick], checks:{}, feitoEm:null};
+  DATA.habitos.push(h); await saveKey('habitos', DATA.habitos);
+  novoHabitoTipo='diario'; diasPick=[]; closeModal(); render();
+}
+
+/* --- dieta --- */
+function dietaForm(){
+  return modalShell('Adicionar alimento', `
+    <div class="field"><label class="f">Nome</label><input id="dNome" placeholder="Ex: Arroz com frango"></div>
+    <div class="field"><label class="f">Quantidade (porções)</label><input id="dQtd" type="number" value="1" min="0.25" step="0.25"></div>
+    <div class="grid2">
+      <div class="field"><label class="f">Calorias (kcal)</label><input id="dKcal" type="number"></div>
+      <div class="field"><label class="f">Proteína (g)</label><input id="dProt" type="number"></div>
+      <div class="field"><label class="f">Carboidrato (g)</label><input id="dCarb" type="number"></div>
+      <div class="field"><label class="f">Gordura (g)</label><input id="dGord" type="number"></div>
+    </div>
+    <button class="btn block" onclick="salvarRefeicao()">Adicionar</button>
+  `);
+}
+async function salvarRefeicao(){
+  const nome = document.getElementById('dNome').value.trim() || 'Alimento';
+  const qtd = parseFloat(document.getElementById('dQtd').value)||1;
+  const kcal = (parseFloat(document.getElementById('dKcal').value)||0)*qtd;
+  const prot = (parseFloat(document.getElementById('dProt').value)||0)*qtd;
+  const carb = (parseFloat(document.getElementById('dCarb').value)||0)*qtd;
+  const gord = (parseFloat(document.getElementById('dGord').value)||0)*qtd;
+  const today = todayStr();
+  if(!DATA.dieta_log[today]) DATA.dieta_log[today]=[];
+  DATA.dieta_log[today].push({nome, qtd, kcal, prot, carb, gord});
+  await saveKey('dieta_log', DATA.dieta_log); closeModal(); render();
+}
+function openMetaDietaModal(){
+  const m = DATA.dieta_meta;
+  document.getElementById('modalRoot').innerHTML = modalShell('Meta diária', `
+    <div class="grid2">
+      <div class="field"><label class="f">Calorias</label><input id="mKcal" type="number" value="${m.kcal}"></div>
+      <div class="field"><label class="f">Proteína (g)</label><input id="mProt" type="number" value="${m.prot}"></div>
+      <div class="field"><label class="f">Carboidrato (g)</label><input id="mCarb" type="number" value="${m.carb}"></div>
+      <div class="field"><label class="f">Gordura (g)</label><input id="mGord" type="number" value="${m.gord}"></div>
+    </div>
+    <button class="btn block" onclick="salvarMetaDieta()">Salvar meta</button>
+  `);
+}
+async function salvarMetaDieta(){
+  DATA.dieta_meta = {
+    kcal: parseFloat(document.getElementById('mKcal').value)||2000,
+    prot: parseFloat(document.getElementById('mProt').value)||150,
+    carb: parseFloat(document.getElementById('mCarb').value)||220,
+    gord: parseFloat(document.getElementById('mGord').value)||60,
+  };
+  await saveKey('dieta_meta', DATA.dieta_meta); closeModal(); render();
+}
+
+/* --- água meta --- */
+function openMetaAguaModal(){
+  document.getElementById('modalRoot').innerHTML = modalShell('Meta de água', `
+    <div class="field"><label class="f">Meta diária (ml)</label><input id="aMeta" type="number" value="${DATA.agua_meta}"></div>
+    <button class="btn block" onclick="salvarMetaAgua()">Salvar</button>
+  `);
+}
+async function salvarMetaAgua(){
+  DATA.agua_meta = parseFloat(document.getElementById('aMeta').value)||2000;
+  await saveKey('agua_meta', DATA.agua_meta); closeModal(); render();
+}
+
+/* --- treino --- */
+let novoTreinoExercicios = [];
+function treinoForm(){
+  return modalShell('Novo treino', `
+    <div class="field"><label class="f">Nome do treino</label><input id="tNome" placeholder="Ex: Treino A - Peito/Tríceps"></div>
+    <div class="field"><label class="f">Exercícios</label>
+      <div class="row" style="gap:6px; margin-bottom:8px;">
+        <input id="exNome" placeholder="Exercício" style="flex:2;">
+        <input id="exSeries" placeholder="séries" type="number" style="flex:1;">
+        <input id="exReps" placeholder="reps" type="number" style="flex:1;">
+      </div>
+      <button class="btn secondary block" onclick="addExercicioTemp()">Adicionar exercício</button>
+      <div id="exList" style="margin-top:10px;"></div>
+    </div>
+    <button class="btn block" onclick="salvarTreino()">Salvar treino</button>
+  `);
+}
+function addExercicioTemp(){
+  const nome = document.getElementById('exNome').value.trim();
+  if(!nome) return;
+  const series = document.getElementById('exSeries').value||3;
+  const reps = document.getElementById('exReps').value||12;
+  novoTreinoExercicios.push({nome, series, reps, feito:false});
+  document.getElementById('exNome').value=''; document.getElementById('exSeries').value=''; document.getElementById('exReps').value='';
+  renderExList();
+}
+function renderExList(){
+  document.getElementById('exList').innerHTML = novoTreinoExercicios.map((e,i)=>`<div class="row between small" style="padding:4px 0;"><span>${e.nome} — ${e.series}x${e.reps}</span><button class="trash" onclick="removeExercicioTemp(${i})">✕</button></div>`).join('');
+}
+function removeExercicioTemp(i){ novoTreinoExercicios.splice(i,1); renderExList(); }
+async function salvarTreino(){
+  const nome = document.getElementById('tNome').value.trim();
+  if(!nome || !novoTreinoExercicios.length){ showToast('Adicione nome e exercícios'); return; }
+  DATA.treinos.push({id:uid(), nome, exercicios:novoTreinoExercicios, data:todayStr()});
+  await saveKey('treinos', DATA.treinos);
+  novoTreinoExercicios=[]; closeModal(); render();
+}
+
+/* --- financeiro --- */
+let novoTxnTipo='saida', novoTxnCat='gasto';
+function financeiroForm(){
+  return modalShell('Novo lançamento', `
+    <div class="field"><label class="f">Tipo</label>
+      <div class="grid2">
+        <button class="chip active" id="txn_entrada_btn" onclick="setTxnTipo('entrada')">Entrada</button>
+        <button class="chip" id="txn_saida_btn" onclick="setTxnTipo('saida')">Saída</button>
+      </div>
+    </div>
+    <div class="field" id="catWrap"><label class="f">Categoria</label>
+      <div class="grid2">
+        <button class="chip active" id="cat_gasto_btn" onclick="setTxnCat('gasto')">Gasto</button>
+        <button class="chip" id="cat_plano_btn" onclick="setTxnCat('plano')">Plano</button>
+      </div>
+    </div>
+    <div class="field"><label class="f">Descrição</label><input id="txDesc" placeholder="Ex: Mercado, Salário, Viagem..."></div>
+    <div class="field"><label class="f">Valor (R$)</label><input id="txValor" type="number" step="0.01"></div>
+    <button class="btn block" onclick="salvarTransacao()">Salvar</button>
+  `);
+}
+function setTxnTipo(t){ novoTxnTipo=t; document.getElementById('txn_entrada_btn').classList.toggle('active',t==='entrada'); document.getElementById('txn_saida_btn').classList.toggle('active',t==='saida'); document.getElementById('catWrap').style.display = t==='entrada'?'none':'block'; }
+function setTxnCat(c){ novoTxnCat=c; document.getElementById('cat_gasto_btn').classList.toggle('active',c==='gasto'); document.getElementById('cat_plano_btn').classList.toggle('active',c==='plano'); }
+async function salvarTransacao(){
+  const valor = parseFloat(document.getElementById('txValor').value);
+  if(!valor){ showToast('Digite um valor'); return; }
+  const desc = document.getElementById('txDesc').value.trim();
+  DATA.transacoes.push({id:uid(), tipo:novoTxnTipo, categoria: novoTxnTipo==='entrada'?'entrada':novoTxnCat, desc, valor, data:todayStr()});
+  await saveKey('transacoes', DATA.transacoes);
+  novoTxnTipo='saida'; novoTxnCat='gasto'; closeModal(); render();
+}
+
+/* --- investimentos --- */
+function investirForm(){
+  return modalShell('Novo investimento', `
+    <div class="field"><label class="f">Nome</label><input id="iNome" placeholder="Ex: Tesouro Selic, CDB, Ações XPTO"></div>
+    <div class="field"><label class="f">Tipo</label><input id="iTipo" placeholder="Ex: Renda fixa, Ações, Cripto"></div>
+    <div class="field"><label class="f">Valor aportado (R$)</label><input id="iValor" type="number" step="0.01"></div>
+    <div class="field"><label class="f">Observação (opcional)</label><input id="iObs" placeholder="Ex: aporte mensal"></div>
+    <button class="btn block" onclick="salvarInvestimento()">Salvar</button>
+  `);
+}
+async function salvarInvestimento(){
+  const nome = document.getElementById('iNome').value.trim();
+  const valor = parseFloat(document.getElementById('iValor').value);
+  if(!nome || !valor){ showToast('Preencha nome e valor'); return; }
+  const tipo = document.getElementById('iTipo').value.trim() || 'Outro';
+  const obs = document.getElementById('iObs').value.trim();
+  DATA.investimentos.push({id:uid(), nome, tipo, valor, obs, data:todayStr()});
+  await saveKey('investimentos', DATA.investimentos); closeModal(); render();
+}
+
+/* --- metas --- */
+function metaForm(){
+  return modalShell('Nova meta', `
+    <div class="field"><label class="f">Título</label><input id="gTitulo" placeholder="Ex: Perder peso, Guardar dinheiro"></div>
+    <div class="grid2">
+      <div class="field"><label class="f">Valor atual</label><input id="gAtual" type="number" value="0"></div>
+      <div class="field"><label class="f">Valor alvo</label><input id="gAlvo" type="number"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label class="f">Unidade</label><input id="gUnidade" placeholder="kg, R$, dias..."></div>
+      <div class="field"><label class="f">Prazo (opcional)</label><input id="gPrazo" type="date"></div>
+    </div>
+    <button class="btn block" onclick="salvarMeta()">Salvar meta</button>
+  `);
+}
+async function salvarMeta(){
+  const titulo = document.getElementById('gTitulo').value.trim();
+  const alvo = parseFloat(document.getElementById('gAlvo').value);
+  if(!titulo || !alvo){ showToast('Preencha título e valor alvo'); return; }
+  const atual = parseFloat(document.getElementById('gAtual').value)||0;
+  const unidade = document.getElementById('gUnidade').value.trim();
+  const prazo = document.getElementById('gPrazo').value;
+  DATA.metas.push({id:uid(), titulo, atual, alvo, unidade, prazo});
+  await saveKey('metas', DATA.metas); closeModal(); render();
+}
+
+/* ---------- init ---------- */
+(async function init(){
+  document.getElementById('app').innerHTML = '<div class="empty">Carregando…</div>';
+  await loadAll();
+  render();
+})();
+</script>
+</body>
+</html>
